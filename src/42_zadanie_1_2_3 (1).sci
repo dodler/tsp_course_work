@@ -1,5 +1,5 @@
 clear();
-SOURCE_FILE_NAME = 'C:\sample.txt'; // входные данные(выборка)
+SOURCE_FILE_NAME = '/home/lyan/tsp/tsp_course_work/src/input/data.txt'; // входные данные(выборка)
 FLOAT_FORMAT = '%16.4f'; // формат представления чисел с плавающей точкой
 INT_FORMAT = '%d'; // формат представления целых чисел
 EPSILON = 1.0E-6; // точность
@@ -114,7 +114,7 @@ printf("Оценка нормальзованной кореллиционной
 printMat(r, FLOAT_FORMAT);
 printf("Радиус корелляции: " + INT_FORMAT + "\n", Tcorr);
 
-scf(1);
+//scf(1); //рисование
 //corrplot();
 
 
@@ -210,20 +210,27 @@ endfunction;
 // Main
 alphas_list = list();
 betas_list = list();
+
+cf=list();
+
+// для одного прохода и нахождения только лишь ар
+MAX_MA_LEVEL=0; // приравнять MAX_AR_LVEL 0 для нахождения коэффициентов сс
+// при MAX_MA_LEVEL=3 И MAX_AR_LEVEL=3 ищутся все модели АРСС(1-3,1-3)
+
 for i = 0 : MAX_AR_LEVEL,
   for j = 0 : MAX_MA_LEVEL,
-    betas = ar(x, i, j);
-    alphas = ma(x, i, j, betas);
+    betas = ar(x, i, j); // коэффиценты АР
+    alphas = ma(x, i, j, betas); // СС
     alphas_list($+1) = alphas;
     betas_list($+1) = betas;
     printf("ARMA(" + INT_FORMAT + "," + INT_FORMAT + ")\n", i, j);
-    if (image(alphas)) then
+    if (image(alphas)) then // проверка существования
       printf("Model does not exist.\n");
-      continue;
+      //continue;
     end;
-    if (~stable(betas)) then
+    if (~stable(betas)) then // проверка устойчивости
       printf("Model exists, but not stable.\n");
-      continue;
+      //continue;
     end;
     printf("alpha:\n")
     printMat(alphas, FLOAT_FORMAT);
