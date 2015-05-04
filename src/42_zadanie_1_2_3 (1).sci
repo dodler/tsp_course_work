@@ -346,6 +346,7 @@ for k = 0 : m,
 end;
 
 r_model = zeros(m+1, 1); // кф модели
+best_ncf=zeros(11);
 
 for i = 0 : MAX_AR_LEVEL,
    for j = 0 : MAX_MA_LEVEL,
@@ -369,13 +370,35 @@ for i = 0 : MAX_AR_LEVEL,
                 best_arma_eps = epsilon(i+1, j+1);
                 best_arma_alpha = alphas;
                 best_arma_beta = betas; 
+                best_ncf=r_model;
         end;
     end;
   end;
+
+// функция рисования графика y
+// в функции остались куски предыщего рисования графика нкф выборки - экспонента и т д.
+// если кто то будет это читаь, и не будет лень, то надо пофиксить
+// чтбы выводилась кастомная надпись и т.д
+// x- аргумент
+// здесь title это имя y. то что будет выводиться в легенде
+function plot_array(x, y, title)
+  xgrid();
+xgrid();
+  
+plot2d(x,y,11);
+  xtitle('Корелляция', 'Номер индекса', title);
+  a = gca();
+    t = [0, 10];
+  plot2d(t, [1/2.71828, 1/2.71828], style=color("green"))
+  plot2d(t, [1/-2.71828, 1/-2.71828], style=color("green"))
+endfunction;
+
 
 printf("Epsilon:\n");
 printMat(epsilon, '%16.7f');
 printf("Best models:\nAR(" + INT_FORMAT + "), MA(" + INT_FORMAT + "), ARMA(" + INT_FORMAT + "," + INT_FORMAT + ").\n", length(best_ar_beta), length(best_ma_alpha) - 1, length(best_arma_beta), length(best_arma_alpha) - 1);
 
+scf(1);
+plot_array([0:10]', best_ncf, 'Корреляционная функция АРСС(3,3)')
 
 
