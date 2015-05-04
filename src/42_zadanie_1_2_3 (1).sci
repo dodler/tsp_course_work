@@ -1,5 +1,5 @@
 clear();
-SOURCE_FILE_NAME = '/home/lyan/tsp/tsp_course_work/src/input/data.txt'; // входные данные(выборка)
+SOURCE_FILE_NAME = '/home/lyan/tsp_course_work/src/input/data.txt'; // входные данные(выборка)
 FLOAT_FORMAT = '%16.4f'; // формат представления чисел с плавающей точкой
 INT_FORMAT = '%d'; // формат представления целых чисел
 EPSILON = 1.0E-6; // точность
@@ -25,22 +25,22 @@ function printMat(M, mformat),
 endfunction;
 
 // график СП 
-//x=fscanfMat(SOURCE_FILE_NAME);
-//f1=mean(x);
-//f2=cmoment(x,2,1);
-//f3=sqrt(f2);
-//plot(x(1:120,:),'k-');
-//plot(0:120:120,f1,'r-');
-//plot(0:120:120,f1-f3,'b-');
-//plot(0:120:120,f1+f3,'b-');
-//xtitle('','Индекс','Значения последовательности');
-//legend('Исходный процесс','Среднее','СКО',4,%f);
-//xgrid(111);
+x=fscanfMat(SOURCE_FILE_NAME);
+f1=mean(x);
+f2=cmoment(x,2,1);
+f3=sqrt(f2);
+plot(x(1:120,:),'k-');
+plot(0:120:120,f1,'r-');
+plot(0:120:120,f1-f3,'b-');
+plot(0:120:120,f1+f3,'b-');
+xtitle('','Индекс','Значения последовательности');
+legend('Исходный процесс','Среднее','СКО',4,%f);
+xgrid(111);
 
 
 
 // ЗАДАНИЕ 1 Оценка корреляционной функции 
-
+// возвращает кф выборки
 function R = correlation(k, x)
   if (k < 0),
     k = -k;
@@ -114,8 +114,8 @@ printf("Оценка нормальзованной кореллиционной
 printMat(r, FLOAT_FORMAT);
 printf("Радиус корелляции: " + INT_FORMAT + "\n", Tcorr);
 
-//scf(1); //рисование
-//corrplot();
+scf(1); //рисование
+corrplot();
 
 
 // Задание 2
@@ -185,7 +185,7 @@ function alphas = ma(x, arLevel, maLevel, betas)
 endfunction;
 
 // Вектор
-
+// просто смотрим если хотя бы один мнимый коэффициент
 function s = image(v)
   s = %F;
   for i = 1:length(v),
@@ -247,8 +247,11 @@ end;
 
 // Теорет. корреляция для АРМА
 
+//здесь betas - известные коэффициенты модели АРМА, которые вычислили из выборки
+//начальные значения кф по выборке
+// k - корядок кф
 function R = theoretical_corr(betas, startR, k)
-  nm = length(startR) - 1;
+  nm = length(startR) - 1; // длина массива startRы
   k = abs(k);
   if (k > nm) then
      R = 0;
@@ -323,7 +326,7 @@ endfunction;
 
 m = 10; // Analysis Depth
 
-epsilon = zeros(MAX_AR_LEVEL, MAX_MA_LEVEL);
+epsilon = zeros(MAX_AR_LEVEL, MAX_MA_LEVEL); // массив для хранеия ошибки
 best_ar_eps = %inf;
 best_ma_eps = %inf;
 best_arma_eps = %inf;
@@ -338,11 +341,11 @@ R = zeros(m+1, 1);
 r = zeros(m+1, 1);
 
 for k = 0 : m,
-    R(k+1) = correlation(k, x);
-    r(k+1) = R(k+1) / R(1);
+    R(k+1) = correlation(k, x); // находим корреляцию по выборке
+    r(k+1) = R(k+1) / R(1); // нормируем - нкф
 end;
 
-r_model = zeros(m+1, 1);
+r_model = zeros(m+1, 1); // кф модели
 
 for i = 0 : MAX_AR_LEVEL,
    for j = 0 : MAX_MA_LEVEL,
@@ -353,7 +356,7 @@ for i = 0 : MAX_AR_LEVEL,
            r_model(k+1) = norm_theoretical_corr(betas, R(1 : (i + j + 1)), k);
        end;
 
-       epsilon(i+1, j+1) = quadratic_error(r, r_model);
+       epsilon(i+1, j+1) = quadratic_error(r, r_model); // считаем ошибку
 
        if (i == 0) & (j~=3)&(j~=2)&(j~=1)&(epsilon(1, j+1) < best_ma_eps) then
            best_ma_eps = epsilon(1, j+1);
