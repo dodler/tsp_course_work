@@ -29,13 +29,34 @@ x=fscanfMat(SOURCE_FILE_NAME);
 f1=mean(x);
 f2=cmoment(x,2,1);
 f3=sqrt(f2);
-plot(x(1:120,:),'k-');
-plot(0:120:120,f1,'r-');
-plot(0:120:120,f1-f3,'b-');
-plot(0:120:120,f1+f3,'b-');
-xtitle('','Индекс','Значения последовательности');
-legend('Исходный процесс','Среднее','СКО',4,%f);
-xgrid(111);
+
+// функция графического построения процесса
+//первых его 120 значений с матожиданием, дисперсией, СКО
+function plot_process (x, name, x_name)
+    scf();
+    m_x=mean(x); // среднее
+    c_m=cmoment(x,2,1); // дисперсия
+    d_x=sqrt(c_m); // корень дисперсии
+    
+    mx = zeros(120);
+    d1 = zeros(120);
+    d2=zeros(120);
+    for i = 1:120
+        mx(i)=m_x;
+        d1(i)=m_x+d_x;
+        d2(i)=m_x-d_x; // нуэжно только для рисования
+    end
+    
+    plot2d(x(1:120,:),  style=color("blue"));
+    plot2d(mx, style=color("red"));
+    plot2d(d1, style=color("green"));
+    plot2d(d2, style=color("green")); // рисование матожиания и отклонение
+    xtitle('',x_name,name);
+    legend('Исходный процесс','Среднее','СКО',4,%f);
+    xgrid(111);
+endfunction;
+
+plot_process(x, 'Значения последовательности', 'Индекс');
 
 
 
@@ -402,3 +423,71 @@ scf(1);
 plot_array([0:10]', best_ncf, 'Корреляционная функция АРСС(3,3)')
 
 
+function eta=imitate(alphas, betas, meanx, count)
+    defect = 1000;
+    eta = zeros(count + defect + 1, 1);
+    ksi = grand(count + defect + 1, 1, 'nor', 0, 1);
+    N = length(alphas) - 1;
+    M = length(betas);
+    for k = 1 : count + defect + 1,
+        eta(k) = 0;
+        for i = 0 : N,
+            if (k - i > 0) then
+               eta(k) = eta(k) + alphas(i+1) * ksi(k - i);
+            end;
+         end;
+
+       for j = 1 : M,
+            if (k - j > 0) then
+                 eta(k) = eta(k) + betas(j) * eta(k - j);
+           end;
+        end;
+    end;
+ 
+    eta = eta(defect + 2 : count + defect + 1) + meanx;
+endfunction;
+
+gen_ar=imitate(best_ar_alpha, best_ar_beta, f1, 5000);
+gen_ma=imitate(best_ar_alpha, [], f1, 5000);
+gen_arma=imitate(best_arma_alpha, best_arma_beta, f1, 5000); // генерирование последовательности на основе наилучших моделей
+
+plot_process(gen_ar, 'Значение последовательности АР(3)', 'Индекс'); // построение их графиков
+plot_process(gen_ma, 'Значение последовательности МА(1)', 'Индекс');
+plot_process(gen_arma, 'Значение последовательности АРМА(3,3)', 'Индекс');
+
+
+t_6_results=list(3);
+// задание 6. анализ последовательностей сгенерированных на основе 
+// моделей АР, СС и АРСС. 
+// ищутся мф, строятся графики НКФ, выводятся значения НКФ.
+// x - выборка, которую надо проанализировать
+function result=task_6(x)
+    result=list();
+    meanx = mean(x); // выборочное среднее
+    svx = variance(x); // выборочная дисперсия
+
+    m = 10; // R = zeros(m, 1);
+    _r = zeros(m, 1);
+    _R = zeros(m,1);
+
+    for i = 0:m,
+      _R(i+1) = correlation(i, x);
+      _r(i+1) = ncorrelation(i, x);
+    end;
+    result(1)=meanx;
+    result(2)=svx;
+    result(3)=_r;
+    result(4)=_R; // запомнили результат
+endfunction
+
+t_6_results(1)=task_6(gen_ma); // Нашли данные анализа для сс
+t_6_results(2)=task_6(gen_ar); // данные анализа для ар
+t_6_results(3)=task_6(gen_arma);
+
+labels=['MA', 'AR', 'ARMA'];
+
+disp("Задание 6");
+for j = 1:3
+    disp(labels(j));
+    disp(t_6_results(j));
+end
