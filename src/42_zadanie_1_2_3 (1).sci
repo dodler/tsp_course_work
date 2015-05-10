@@ -96,7 +96,7 @@ endfunction;
 // график нормированной корреляционной функции
 
 function corrplot()
-  m = 10;
+  m = 20;
   t = [0:m];
   y = zeros(length(t), 1);
   for i = 1:length(t),
@@ -104,13 +104,13 @@ function corrplot()
   end;
   xgrid();
 xgrid();
-  
-plot2d(t, y, 11);
+plot2d(t, y, 20); // здесь изменено, добавлено 20 значений нкф
   xtitle('Корелляция', 'Номер индекса', 'Нормализованная корелляционная функция');
   a = gca();
-  t = [0, 10];
+  t = [0, m];
   plot2d(t, [1/2.71828, 1/2.71828], style=color("green"))
   plot2d(t, [1/-2.71828, 1/-2.71828], style=color("green"))
+    legend('НКФ процесса','exp(-1)','-exp(-1)');
 endfunction;
 
 
@@ -118,8 +118,9 @@ endfunction;
 meanx = mean(x); // выборочное среднее
 svx = variance(x); // выборочная дисперсия
 
-m = 10; // R = zeros(m, 1);
-r = zeros(m, 1);
+m = 20; // R = zeros(m, 1);
+r = zeros(m, 1); // сделано 20, так у меня радиус корреляции 17
+// чтобы показать определение радиуса корреляции
 
 for i = 0:m,
   R(i+1) = correlation(i, x);
@@ -271,18 +272,20 @@ end;
 //здесь betas - известные коэффициенты модели АРМА, которые вычислили из выборки
 //начальные значения кф по выборке
 // k - корядок кф
+// возвращает одно значение кф - с номером k
 function R = theoretical_corr(betas, startR, k)
-  nm = length(startR) - 1; // длина массива startRы
+  nm = length(startR) - 1; // длина массива startR
   k = abs(k);
-  if (k > nm) then
-     R = 0;
+  if (k > nm) then // если потребовался номер кф больше, чем есть выборочных
+     R = 0; // то будем считать
      M = length(betas);
 
      for j = 1 : M,
-         R = R + betas(j) * theoretical_corr(betas, startR, k - j);
+         R = R + betas(j) * theoretical_corr(betas, startR, k - j); // тут расчет на основе предыдущих коэффициентов
+	//формулу монжо увидеть в отчете на стр. прежположительно 9
     end;
   else
-    R = startR(k + 1);
+    R = startR(k + 1); // иначе считаем, то первые значения теоретической кф и выборочной совпадают
   end;
 endfunction;
 
@@ -303,6 +306,7 @@ function epsilon = quadratic_error(x, y)
 endfunction;
 
 function corrplot2(betas, R, N, M, m_)
+    scf();
    p.thickness = 6;
    m = m_;
    t = [-m:m];
@@ -321,6 +325,8 @@ function corrplot2(betas, R, N, M, m_)
    p.mark_style = 11;
    p.mark_size = 3;
 endfunction;
+
+// моделироание сп на основе моделей АР, СС , АРСС
 function eta = imitate(alphas, betas, meanx, count)
     defect = 1000;
     eta = zeros(count + defect + 1, 1);
@@ -419,7 +425,7 @@ printf("Epsilon:\n");
 printMat(epsilon, '%16.7f');
 printf("Best models:\nAR(" + INT_FORMAT + "), MA(" + INT_FORMAT + "), ARMA(" + INT_FORMAT + "," + INT_FORMAT + ").\n", length(best_ar_beta), length(best_ma_alpha) - 1, length(best_arma_beta), length(best_arma_alpha) - 1);
 
-scf(1);
+scf();
 plot_array([0:10]', best_ncf, 'Корреляционная функция АРСС(3,3)')
 
 
