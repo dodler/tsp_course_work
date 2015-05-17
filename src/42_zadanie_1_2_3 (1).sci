@@ -396,13 +396,14 @@ for i = 0 : MAX_AR_LEVEL,
 
        epsilon(i+1, j+1) = quadratic_error(r, r_model); // считаем ошибку
 
-        if (i=0)& (j=1) then
-            best_ma_ncf=r_model;
+        if (i==0)& (j==1) then
+            best_ma_ncf=r_model; // костыль
         end;
 
        if (i == 0) & (j~=3)&(j~=2)&(j~=1)&(epsilon(1, j+1) < best_ma_eps) then
            best_ma_eps = epsilon(1, j+1);
            best_ma_alpha = alphas;
+			best_ma_betas=betas;
        elseif (j == 0) & (epsilon(i+1, 1) < best_ar_eps) then
                best_ar_eps = epsilon(i+1, 1);
                best_ar_alpha = alphas;
