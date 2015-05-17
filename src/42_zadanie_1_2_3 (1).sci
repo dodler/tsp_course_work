@@ -526,21 +526,21 @@ for j = 1:3
     disp(t_6_results(j));
 end
 
-plot_input_arg(1)=t_6_results(1)(3);
+plot_input_arg(3)=t_6_results(1)(3);
 plot_input_arg(2)=best_ma_ncf;
-plot_input_arg(3)=theor_ncf;
+plot_input_arg(1)=theor_ncf;
 colors= list();
 colors(1)="red";
 colors(2)="black";
 colors(3)="blue";
 scf();
-plot_array([0:10]', plot_input_arg,'Модель СС(1)', ["Source','Model','Imitation'], colors);
-plot_input_arg(1)=t_6_results(2)(3);
+plot_array([0:10]', plot_input_arg,'Модель СС(1)', ['Source','Model','Imitation'], colors);
+plot_input_arg(3)=t_6_results(2)(3);
 plot_input_arg(2)=best_ncf;
 scf();
 plot_array([0:10]', plot_input_arg,'Модель АР(3)', ['Source','Model','Imitation'],colors);
 
-plot_input_arg(1)=t_6_results(3)(3);
+plot_input_arg(3)=t_6_results(3)(3);
 plot_input_arg(2)=best_arma_theor_ncf;
 scf();
 plot_array([0:10]',plot_input_arg , 'Модель АРСС(3,3)', ['Source','Model','Imitation'],colors);
