@@ -1,0 +1,44 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{тсп}
+\author{avn8068 }
+\date{May 2015}
+
+\long\def\comment{}
+
+\begin{document}
+ 
+\maketitle
+
+\section{Introduction}
+
+\cases{
+\hat{R_{\eta}}(4)=\beta_{1}\hat{R_{\eta}}(3)+\beta_{2}\hat{R_{\eta}}(2)+\beta_{3}\hat{R_{\eta}}(1)\cr
+\hat{R_{\eta}}(5)=\beta_{1}\hat{R_{\eta}}(4)+\beta_{2}\hat{R_{\eta}}(3)+\beta_{3}\hat{R_{\eta}}(2)\cr
+\hat{R_{\eta}}(6)=\beta_{1}\hat{R_{\eta}}(5)+\beta_{2}\hat{R_{\eta}}(4)+\beta_{3}\hat{R_{\eta}}(3)
+}
+\\
+\\
+\cases{
+\hat{R_{\xi \eta }}(0)=\alpha _{0} \cr
+ \hat{R_{\xi \eta }}(1)=\beta_{1}\hat{R_{\xi \eta }}(0)+\alpha{0} \cr
+ \hat{R_{\xi \eta }}(2) = \beta_{1}\hat{R_{\xi \eta }}(1) + \beta_{2}\hat{R_{\xi \eta }}(0) + \alpha_{2}\cr
+ \hat{R_{\xi \eta }}(3) = \beta_{1}\hat{R_{\xi \eta }}(2)+\beta{2}\hat{R_{\xi \eta }}(1)+\beta_{3}\hat{R_{\xi \eta }}(0) + \alpha_{3}\cr
+ }
+
+\comment{
+начинается самое интеренсное
+и да смайлики не получится писать
+как и запятые и любые знаки
+}
+\\
+\cr
+\cases{
+\hat{R_{\eta }}(0)=\alpha_{0}\hat{R_{\xi \eta }}(0)+\alpha_{1}\hat{R_{\xi \eta }}(1) + \alpha_{2}\hat{R_{\xi \eta }}(2)+\alpha_{3}\hat{R_{\xi \eta }}(3)+\beta_{1}\hat{R_{\eta }}(1)+\beta_{2}\hat{R_{\eta }}(2)+\beta_{3}\hat{R_{\eta }}(3)\cr
+\hat{R_{\eta }}(1)=\alpha_{1}\hat{R_{\xi \eta }}(0)+\alpha_{2}\hat{R_{\xi \eta }}(1) + \alpha_{3}\hat{R_{\xi \eta }}(2)+\beta_{1}\hat{R_{\eta }}(0)+\beta_{2}\hat{R_{\eta }}(1)+\beta_{3}\hat{R_{\eta }}(2)\cr
+\hat{R_{\eta }}(2)=\alpha_{2}\hat{R_{\xi \eta }}(0)+\alpha_{3}\hat{R_{\xi \eta }}(1)+\beta_{1}\hat{R_{\eta }}(1)+\beta_{2}\hat{R_{\eta }}(1)+\beta_{3}\hat{R_{\eta }}(0)\cr
+\hat{R_{\eta }}(3)=\alpha_{3}\hat{R_{\xi \eta }}(0)+\beta_{1}\hat{R_{\eta }}(2)+\beta_{2}\hat{R_{\eta }}(1)+\beta_{3}\hat{R_{\eta }}(0)\cr
+}
+
+\end{document}
