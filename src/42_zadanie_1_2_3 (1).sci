@@ -122,10 +122,18 @@ m = 20; // R = zeros(m, 1);
 r = zeros(m, 1); // сделано 20, так у меня радиус корреляции 17
 // чтобы показать определение радиуса корреляции
 
+t_ncf=zeros(11);
 for i = 0:m,
   R(i+1) = correlation(i, x);
   r(i+1) = ncorrelation(i, x);
+  t_ncf(i+1)=r(i+1);
 end;
+
+theor_ncf=zeros(11);
+for i=1:11
+    theor_ncf(i)=t_ncf(i);
+end
+
 
 Tcorr = corrdist(x);
 printf("Выборочное среднее: " + FLOAT_FORMAT + "\n", meanx);
@@ -296,7 +304,8 @@ function r = norm_theoretical_corr(betas, startR, k)
 endfunction;
 
 // Квадратичное отклонение
-
+// ака СКО - среднее квадритчное отклонение
+// на вход подавать два вектора теоретической и выборочной нкф
 function epsilon = quadratic_error(x, y)
    epsilon = 0;
    m = min(length(x), length(y));
@@ -374,6 +383,7 @@ end;
 
 r_model = zeros(m+1, 1); // кф модели
 best_ncf=zeros(11);
+best_ma_ncf=zeros(11); // кф лучшей модели сс
 
 for i = 0 : MAX_AR_LEVEL,
    for j = 0 : MAX_MA_LEVEL,
@@ -385,6 +395,10 @@ for i = 0 : MAX_AR_LEVEL,
        end;
 
        epsilon(i+1, j+1) = quadratic_error(r, r_model); // считаем ошибку
+
+        if (i=0)& (j=1) then
+            best_ma_ncf=r_model;
+        end;
 
        if (i == 0) & (j~=3)&(j~=2)&(j~=1)&(epsilon(1, j+1) < best_ma_eps) then
            best_ma_eps = epsilon(1, j+1);
@@ -408,16 +422,24 @@ for i = 0 : MAX_AR_LEVEL,
 // чтбы выводилась кастомная надпись и т.д
 // x- аргумент
 // здесь title это имя y. то что будет выводиться в легенде
-function plot_array(x, y, title)
+// leg - легенда, массив строк
+// colors - цвета, тоже массив строк
+function plot_array(x, y, name, leg, colors)
   xgrid();
 xgrid();
-  
-plot2d(x,y,11);
-  xtitle('Корелляция', 'Номер индекса', title);
+  len = length(y);
+  for i=1:len
+      plot2d(x,y(i), style=color(colors(i)));
+  end
+  xtitle('Функция', 'Аргумент', name);
   a = gca();
     t = [0, 10];
   plot2d(t, [1/2.71828, 1/2.71828], style=color("green"))
   plot2d(t, [1/-2.71828, 1/-2.71828], style=color("green"))
+  
+  leg(len+1)='1/exp';
+  leg(len+2)='-1/exp';
+  legend(leg);
 endfunction;
 
 
@@ -425,8 +447,13 @@ printf("Epsilon:\n");
 printMat(epsilon, '%16.7f');
 printf("Best models:\nAR(" + INT_FORMAT + "), MA(" + INT_FORMAT + "), ARMA(" + INT_FORMAT + "," + INT_FORMAT + ").\n", length(best_ar_beta), length(best_ma_alpha) - 1, length(best_arma_beta), length(best_arma_alpha) - 1);
 
+
+best_arma_theor_ncf=best_ncf;
+
+plot_input_arg=list();
+plot_input_arg(1)=best_ncf;
 scf();
-plot_array([0:10]', best_ncf, 'Корреляционная функция АРСС(3,3)')
+plot_array([0:10]', plot_input_arg, 'Корреляционная функция АРСС(3,3)', ['НКФ модели'], ['red'])
 
 
 function eta=imitate(alphas, betas, meanx, count)
@@ -484,6 +511,7 @@ function result=task_6(x)
     result(2)=svx;
     result(3)=_r;
     result(4)=_R; // запомнили результат
+    result(5)=quadratic_error(t_ncf, _r);
 endfunction
 
 t_6_results(1)=task_6(gen_ma); // Нашли данные анализа для сс
@@ -497,3 +525,22 @@ for j = 1:3
     disp(labels(j));
     disp(t_6_results(j));
 end
+
+plot_input_arg(1)=t_6_results(1)(3);
+plot_input_arg(2)=best_ma_ncf;
+plot_input_arg(3)=theor_ncf;
+colors= list();
+colors(1)="red";
+colors(2)="black";
+colors(3)="blue";
+scf();
+plot_array([0:10]', plot_input_arg,'Модель СС(1)', ["Source','Model','Imitation'], colors);
+plot_input_arg(1)=t_6_results(2)(3);
+plot_input_arg(2)=best_ncf;
+scf();
+plot_array([0:10]', plot_input_arg,'Модель АР(3)', ['Source','Model','Imitation'],colors);
+
+plot_input_arg(1)=t_6_results(3)(3);
+plot_input_arg(2)=best_arma_theor_ncf;
+scf();
+plot_array([0:10]',plot_input_arg , 'Модель АРСС(3,3)', ['Source','Model','Imitation'],colors);
